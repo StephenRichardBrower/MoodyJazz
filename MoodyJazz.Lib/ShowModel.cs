@@ -1,7 +1,11 @@
-﻿namespace MoodyJazz.Lib
-{
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.ServiceModel.Syndication;
 
+[assembly: InternalsVisibleTo("MoodyJazz.Test")]
+namespace MoodyJazz.Lib
+{
     /// <summary>
     /// Encapsulation of an entire show, represented wholly within one RSS feed XML,
     /// so this file will often consume the 'headers' and then iterate down into
@@ -9,6 +13,20 @@
     /// </summary>
     internal sealed class ShowModel
     {
+        /// <summary>
+        /// Constructs a new Show Model based on a feed.
+        /// </summary>
+        /// <param name="baseFeed"></param>
+        internal ShowModel(SyndicationFeed baseFeed)
+        {
+            URL = baseFeed.BaseUri?.ToString();
+            Title = baseFeed.Title?.Text;
+            Description = baseFeed.Description?.Text.CleanMarkup();
+            ImageLocation = baseFeed.ImageUrl?.ToString();
+            Copyright = baseFeed.Copyright?.Text;
+            Language = baseFeed.Language;
+        }
+
         /// <summary>
         /// Generally the Show URL itself.
         /// </summary>
@@ -23,6 +41,16 @@
         /// Show Description - long string.
         /// </summary>
         internal string Description { get; set; }
+
+        /// <summary>
+        /// Language of the show.
+        /// </summary>
+        internal string Language { get; set; }
+
+        /// <summary>
+        /// Date of the latest publish.
+        /// </summary>
+        internal DateTime PubDate { get; set; }
 
         /// <summary>
         /// Stores the Temp image location.
