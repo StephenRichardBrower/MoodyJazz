@@ -17,13 +17,14 @@ namespace MoodyJazz.Lib
         /// and component <see cref="EpisodeModel"/> s.
         /// </summary>
         /// <param name="rssUrl"></param>
-        public void IterateFeed(SyndicationFeed feed)
+        public ShowModel IterateFeed(SyndicationFeed feed)
         {
             var show = new ShowModel(feed);
             foreach (SyndicationItem item in feed.Items)
             {
                 show.Items.Add(new EpisodeModel(item));
             }
+            return show;
         }
 
         /// <summary>

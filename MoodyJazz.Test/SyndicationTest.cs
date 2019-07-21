@@ -21,5 +21,33 @@ namespace MoodyJazz.Test
             var feed = model.SyndicateFileFeed("D:\\checkout\\sample\\giantbomb.xml");
             model.IterateFeed(feed);
         }
+
+        [TestMethod]
+        public void CanParseBareMinimum()
+        {
+            var model = new Model();
+            var feed = model.SyndicateFileFeed("D:\\checkout\\sample\\giantbomb.xml");
+            var show = model.IterateFeed(feed);
+
+            Assert.IsTrue(_hasUsefulContents(show.Title));
+            Assert.IsTrue(_hasUsefulContents(show.Description));
+
+            foreach (var ep in show.Items)
+            {
+                Assert.IsTrue(_hasUsefulContents(ep.Title));
+                Assert.IsTrue(_hasUsefulContents(ep.Description));
+                Assert.IsTrue(_hasUsefulContents(ep.URL));
+            }
+        }
+
+        /// <summary>
+        /// Helper test function.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private bool _hasUsefulContents(string content)
+        {
+            return !string.IsNullOrEmpty(content) && content.Length > 3;
+        }
     }
 }
