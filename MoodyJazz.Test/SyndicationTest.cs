@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MoodyJazz.Lib;
+using System;
+using System.IO;
 
 namespace MoodyJazz.Test
 {
@@ -36,8 +38,23 @@ namespace MoodyJazz.Test
             {
                 Assert.IsTrue(_hasUsefulContents(ep.Title));
                 Assert.IsTrue(_hasUsefulContents(ep.Description));
-                Assert.IsTrue(_hasUsefulContents(ep.URL));
+                Assert.IsTrue(_hasUsefulContents(ep.Permalink));
             }
+        }
+
+        [TestMethod]
+        public void CanDownloadAnyParsedEpisode()
+        {
+            var model = new Model();
+            var feed = model.SyndicateUrlFeed("https://www.npr.org/rss/podcast.php?id=510313");
+            var show = model.IterateFeed(feed);
+
+            var random = new Random();
+            var randomIndex = random.Next(show.Items.Count);
+            var testShow = show.Items[randomIndex];
+            testShow.Download();
+            Assert.IsTrue(File.Exists(testShow.FilePath));
+            File.Delete(testShow.FilePath);
         }
 
         /// <summary>
