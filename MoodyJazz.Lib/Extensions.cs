@@ -1,4 +1,6 @@
 ﻿using HtmlAgilityPack;
+using System.IO;
+using System.Linq;
 
 namespace MoodyJazz.Lib
 {
@@ -19,5 +21,13 @@ namespace MoodyJazz.Lib
             mainDoc.LoadHtml(htmlString);
             return mainDoc.DocumentNode.InnerText;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string CleanFileName(this string str)
+            => Path.GetInvalidFileNameChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), string.Empty));
     }
 }

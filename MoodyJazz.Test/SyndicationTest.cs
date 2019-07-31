@@ -46,13 +46,13 @@ namespace MoodyJazz.Test
         public void CanDownloadAnyParsedEpisode()
         {
             var model = new Model();
-            var feed = model.SyndicateUrlFeed("https://www.npr.org/rss/podcast.php?id=510313");
+            var feed = model.SyndicateUrlFeed("https://feed.pippa.io/public/shows/5d137ece8b774eb816199f63");
             var show = model.IterateFeed(feed);
 
             var random = new Random();
             var randomIndex = random.Next(show.Items.Count);
             var testShow = show.Items[randomIndex];
-            testShow.Download();
+            testShow.Download("D:\\Steph\\Downloads\\");
             Assert.IsTrue(File.Exists(testShow.FilePath));
             File.Delete(testShow.FilePath);
         }

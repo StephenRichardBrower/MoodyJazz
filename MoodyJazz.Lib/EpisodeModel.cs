@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.ServiceModel.Syndication;
@@ -17,9 +18,9 @@ namespace MoodyJazz.Lib
         /// Represents a single episode parsed from a stream.
         /// </summary>
         /// <param name="baseItem"></param>
-        internal EpisodeModel(SyndicationItem baseItem)
+        internal EpisodeModel(SyndicationItem baseItem, int epIndex, string showTitle)
         {
-            Title = baseItem.Title.Text;
+            Title = baseItem.Title.Text.CleanFileName();
             Description = baseItem.Summary.Text.CleanMarkup();
             PubDate = baseItem.PublishDate;
 
@@ -31,7 +32,9 @@ namespace MoodyJazz.Lib
                 {
                     Permalink = link.Uri.ToString();
                     Extension = Path.GetExtension(Permalink).Substring(0,4);
-                    FileName = $"X. {Title}{Extension}";
+                    if (string.IsNullOrWhiteSpace(Extension))
+                        Extension = ParseOutExtension(Permalink.ToLowerInvariant());
+                    FileName = $"{showTitle} {epIndex} - {Title}{Extension}";
                 }
                 else
                 {
@@ -62,7 +65,7 @@ namespace MoodyJazz.Lib
         /// Title for the episode.
         /// </summary>
         internal string Title { get; set; }
-
+        
         /// <summary>
         /// Episode description.
         /// </summary>
@@ -119,17 +122,39 @@ namespace MoodyJazz.Lib
         /// a stored file located at <see cref="FilePath"/>.
         /// </summary>
         /// <returns>On a successful conversion.</returns>
-        internal bool Download()
+        internal bool Download(string downloadDir)
         {
-            string path = Path.GetTempPath();
-            FilePath = $"{path}\\{FileName}";
+            FilePath = $"{downloadDir}\\{FileName}";
 
             using (var client = new WebClient())
             {
-                client.DownloadFile(Permalink, FilePath);
+                var uriLink = new Uri(Permalink);
+                client.DownloadFile(Permalink, FileName);
             }
 
+            File.Move(FileName, FilePath);
             return true;
+        }
+
+        /// <summary>
+        /// Sometimes we don't know the extension so we
+        /// just infer it from their messy analytics permalink.
+        /// </summary>
+        /// <param name="loweredLink">Link ToLower</param>
+        /// <returns>extension</returns>
+        internal string ParseOutExtension(string loweredLink)
+        {
+            if (loweredLink.Contains("mp3"))
+                return ".mp3";
+            if (loweredLink.Contains("m4a"))
+                return ".m4a";
+            if (loweredLink.Contains("wma"))
+                return ".wma";
+            if (loweredLink.Contains("ogg"))
+                return ".ogg";
+            if (loweredLink.Contains("aac"))
+                return ".aac";
+            return ".mp3";
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel.Syndication;
 using System.Xml;
@@ -20,10 +21,11 @@ namespace MoodyJazz.Lib
         public ShowModel IterateFeed(SyndicationFeed feed)
         {
             var show = new ShowModel(feed);
-            foreach (SyndicationItem item in feed.Items)
+            for (int i = 0; i < feed.Items.Count(); ++i)
             {
-                show.Items.Add(new EpisodeModel(item));
+                show.Items.Add(new EpisodeModel(feed.Items.ElementAt(i), i+1, show.Title));
             }
+
             return show;
         }
 
